@@ -1,8 +1,9 @@
+import json
 import random
 import string
 import time
 import hashlib
-import datetime
+from datetime import datetime
 
 
 class Utility:
@@ -30,3 +31,9 @@ class Utility:
         """Convert string representations back to types."""
         type_map = {"str": str, "int": int, "float": float, "bool": bool, "dict": dict, "list": list, "datetime": datetime}
         return {k: type_map[v] for k, v in schema.items()}
+    
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime): 
+            return obj.isoformat()
+        return super().default(obj)

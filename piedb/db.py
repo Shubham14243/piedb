@@ -1,9 +1,10 @@
 import json
 import os
-import datetime
+from datetime import datetime
 from threading import RLock
 
 from .util import Utility
+from .util import CustomJSONEncoder
 from .error import CollectionNotFoundError
 from .error import SchemaValidationError
 from .error import DocumentValidationError
@@ -24,7 +25,7 @@ class Database:
         
         if not os.path.exists(self.db_file):
             with open(self.db_file, "w") as f:
-                json.dump(self.SKELETON, f)
+                json.dump(self.SKELETON, f, indent=4)
 
 
     def _read_db(self):
@@ -40,7 +41,7 @@ class Database:
         
         with self.lock:
             with open(self.db_file, "w") as f:
-                json.dump(data, f, indent=4)
+                json.dump(data, f, indent=4, cls=CustomJSONEncoder)
 
 
     def delete_db(self):
@@ -169,12 +170,13 @@ class Database:
                 raise SchemaValidationError(f"Missing required field: {field}")
             
             if field_type is datetime:
-                if not isinstance(document[field], str):
-                    raise DocumentValidationError(f"Field '{field}' must be a string in ISO format.")
-                try:
-                    datetime.datetime.fromisoformat(document[field])
-                except ValueError:
-                    raise DocumentValidationError(f"Field '{field}' must be a valid ISO 8601 datetime string.")
+                if not isinstance(document[field], (str, datetime)):
+                    raise DocumentValidationError(f"Field '{field}' must be a datetime object or a string in ISO format.")
+                if isinstance(document[field], str):  # Convert string to datetime
+                    try:
+                        document[field] = datetime.fromisoformat(document[field])
+                    except ValueError:
+                        raise DocumentValidationError(f"Field '{field}' must be a valid ISO 8601 datetime string.")
             elif not isinstance(document[field], field_type):
                 raise DocumentValidationError(f"Field '{field}' must be of type {field_type.__name__}.")
         return True
@@ -375,7 +377,7 @@ class Database:
             if not os.path.exists(self.db_file):
                 raise FileNotFoundError(f"Database file '{self.db_file}' does not exist.")
 
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_filename = f"{backup_file}_{timestamp}.json"
 
             backup_dir = os.path.dirname(backup_file)
