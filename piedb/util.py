@@ -9,7 +9,7 @@ from datetime import datetime
 class Utility:
     
     @staticmethod
-    def generate_id(collection_name, length=12):
+    def generate_id(collection_name: str, length: int =12) -> str:
         """Generate an UniqueId."""
         
         timestamp = int(time.time())
@@ -22,12 +22,12 @@ class Utility:
         return timestamp_str + collection_hash + random_part
 
     @staticmethod
-    def _type_to_string(schema):
+    def _type_to_string(schema: dict) -> dict:
         """Convert schema types to string representations."""
         return {k: v.__name__ for k, v in schema.items()}
 
     @staticmethod
-    def _string_to_type(schema):
+    def _string_to_type(schema: dict) -> dict:
         """Convert string representations back to types."""
         type_map = {"str": str, "int": int, "float": float, "bool": bool, "dict": dict, "list": list, "datetime": datetime}
         return {k: type_map[v] for k, v in schema.items()}

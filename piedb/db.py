@@ -14,7 +14,7 @@ from .error import ReservedKeyError
 class Database:
     
     
-    def __init__(self, db_file="database"):
+    def __init__(self, db_file: str ="database") -> None:
         """Initialize the Database"""
         
         self.EXT = ".json"
@@ -28,7 +28,7 @@ class Database:
                 json.dump(self.SKELETON, f, indent=4)
 
 
-    def _read_db(self):
+    def _read_db(self) -> None:
         """Read the database from the file."""
         
         with self.lock:
@@ -36,7 +36,7 @@ class Database:
                 return json.load(f)
 
 
-    def _write_db(self, data):
+    def _write_db(self, data: dict) -> None:
         """Write the database to the file."""
         
         with self.lock:
@@ -44,7 +44,7 @@ class Database:
                 json.dump(data, f, indent=4, cls=CustomJSONEncoder)
 
 
-    def delete_db(self):
+    def delete_db(self) -> None:
         """Delete the entire database file."""
         
         with self.lock:
@@ -52,7 +52,7 @@ class Database:
                 os.remove(self.db_file)
 
 
-    def set_schema(self, collection, schema={}):
+    def set_schema(self, collection: str, schema: dict={}) -> None:
         """Define a schema for a collection."""
         with self.lock:
             self._validate_collection_exists(collection)
@@ -64,7 +64,7 @@ class Database:
             self._write_db(db)
 
 
-    def get_schema(self, collection):
+    def get_schema(self, collection: str) -> dict:
         """Retrieve the schema for a collection."""
         
         db = self._read_db()
@@ -73,7 +73,7 @@ class Database:
         return Utility._string_to_type(schema) if schema else None
     
     
-    def _set_count(self, collection):
+    def _set_count(self, collection: str) -> None:
         """Initialize or Update the count for a collection."""
         with self.lock:
             db = self._read_db()
@@ -81,7 +81,7 @@ class Database:
             self._write_db(db)
     
     
-    def get_count(self, collection):
+    def get_count(self, collection: str) -> int:
         """Retrieve the count for a collection."""
         
         with self.lock:
@@ -90,7 +90,7 @@ class Database:
             return count
 
 
-    def _validate_collection_exists(self, collection):
+    def _validate_collection_exists(self, collection: str) -> None:
         """Check if a collection exists in the database."""
         
         db = self._read_db()
@@ -100,7 +100,7 @@ class Database:
             raise CollectionNotFoundError(collection)
 
 
-    def collection(self, collection, schema=None):
+    def collection(self, collection: str, schema: dict =None) -> None:
         """Create a new collection with a schema."""
         
         if collection in self.RESERVED_KEYS:
@@ -119,8 +119,8 @@ class Database:
                     self._set_count(collection)
 
 
-    def get_collections(self):
-        """Return a list of all collections."""
+    def get_collections(self) -> dict:
+        """Return a dict of all collections."""
         
         db = self._read_db()
         collections = list(db["_schemas"].keys())
@@ -128,7 +128,7 @@ class Database:
         return {"collections": collections, "count": count}
 
 
-    def delete_collection(self, collection):
+    def delete_collection(self, collection: str) -> None:
         """Delete a collection."""
 
         with self.lock:
@@ -145,7 +145,7 @@ class Database:
                 raise e
         
     
-    def get_collection_data(self, collection):
+    def get_collection_data(self, collection: str) -> dict:
         """Get a collection's data."""
         
         with self.lock:
@@ -158,7 +158,7 @@ class Database:
             return {collection: {"_schema": collection_schema, "count": collection_count, "data": data}}
 
 
-    def _validate_document(self, collection, document):
+    def _validate_document(self, collection: str, document: dict) -> bool:
         """Validate a document against the collection's schema."""
         
         schema = self.get_schema(collection)
@@ -182,7 +182,7 @@ class Database:
         return True
 
 
-    def add(self, collection, document):
+    def add(self, collection: str, document: dict) -> str:
         """Add a new document to a collection."""
         
         with self.lock:
@@ -206,7 +206,7 @@ class Database:
             return unique_id
 
 
-    def add_many(self, collection, documents):
+    def add_many(self, collection: str, documents: list) -> list:
         """Add multiple new documents to a collection."""
         
         with self.lock:
@@ -231,7 +231,7 @@ class Database:
             return added_ids
 
 
-    def _evaluate_condition(self, doc_value, condition):
+    def _evaluate_condition(self, doc_value: any, condition: dict) -> bool:
         """Evaluate a condition (support for $gt, $lt, $ne, $eq)."""
         
         if isinstance(condition, dict):
@@ -255,7 +255,7 @@ class Database:
         return True
 
 
-    def find(self, collection, query=None, limit=None, skip=0, sort=None, order="asc"):
+    def find(self, collection: str, query: dict =None, limit: int =None, skip: int =0, sort: str =None, order: str ="asc") -> list:
     
         with self.lock:
             self._validate_collection_exists(collection)
@@ -290,7 +290,7 @@ class Database:
             return documents
 
 
-    def update(self, collection, updates, query = None, limit = 0):
+    def update(self, collection: str, updates: dict, query: dict =None, limit: int =0) -> list:
         """Update all documents in a collection that match the query."""
         
         with self.lock:
@@ -326,7 +326,7 @@ class Database:
             return updated_documents
 
 
-    def delete(self, collection, query=None, limit = 0):
+    def delete(self, collection: str, query: dict =None, limit: int =0) -> list:
         """Delete the first document from a collection that matches the query, or the first document if no query is provided."""
         
         with self.lock:
@@ -369,7 +369,7 @@ class Database:
             return deleted_docs
 
 
-    def backup_db(self, backup_file="backup"):
+    def backup_db(self, backup_file: str ="backup") -> str:
         """Create a backup of the database."""
         
         with self.lock:
