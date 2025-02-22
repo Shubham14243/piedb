@@ -422,3 +422,12 @@ Returns: A list of matching documents.
 **DocumentValidationError** - when a document has invalid fields or missing data
 
 **ReservedKeyError** - when the string contains reserved keys - _schemas and _counts
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
+
+## Authors
+
+- [Shubham Kumar Gupta](https://github.com/Shubham14243)

@@ -26,7 +26,7 @@ class DocumentValidationError(Exception):
 
 
 class ReservedKeyError(Exception):
-    """Raised when no document matches the query."""
+    """Raised when the string contains reserved keys - _schemas and _counts."""
     
     def __init__(self, message="are reserved keys."):
         self.keys = "_schemas and _counts"
