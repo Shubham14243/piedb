@@ -44,12 +44,14 @@ class Database:
                 json.dump(data, f, indent=4, cls=CustomJSONEncoder)
 
 
-    def delete_db(self) -> None:
+    def delete_db(self) -> bool:
         """Delete the entire database file."""
         
         with self.lock:
             if os.path.exists(self.db_file):
                 os.remove(self.db_file)
+                return True
+        return False
 
 
     def set_schema(self, collection: str, schema: dict={}) -> None:
@@ -128,7 +130,7 @@ class Database:
         return {"collections": collections, "count": count}
 
 
-    def delete_collection(self, collection: str) -> None:
+    def delete_collection(self, collection: str) -> bool:
         """Delete a collection."""
 
         with self.lock:
@@ -140,9 +142,11 @@ class Database:
                 db["_counts"].pop(collection, None)
                 db.pop(collection, None)
                 self._write_db(db)
+                return True
                 
             except Exception as e:
                 raise e
+        return False
         
     
     def get_collection_data(self, collection: str) -> dict:
