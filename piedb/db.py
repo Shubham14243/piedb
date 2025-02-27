@@ -238,6 +238,9 @@ class Database:
     def _evaluate_condition(self, doc_value: any, condition: dict) -> bool:
         """Evaluate a condition (support for $gt, $lt, $ne, $eq)."""
         
+        if doc_value is None:
+            return False
+        
         if isinstance(condition, dict):
             for operator, value in condition.items():
                 if operator == '$gt':
@@ -310,13 +313,25 @@ class Database:
                 query = {}
                 
             db = self._read_db()
+            collection_data = db[collection]
 
-            for doc in db[collection]:
-                
-                if limit != 0 and updated_count >= limit:
+            for doc in collection_data:
+                if updated_count >= limit and limit > 0:
                     break
-                
-                if all(self._evaluate_condition(doc.get(k), v) for k, v in query.items()):
+
+                match = True
+                for k, v in query.items():
+                    if k == '$or' and isinstance(v, list):
+                        match = any(self._evaluate_condition(doc.get(cond[0]), cond[1]) for cond in v)
+                    elif k == '$and' and isinstance(v, list):
+                        match = all(self._evaluate_condition(doc.get(cond[0]), cond[1]) for cond in v)
+                    else:
+                        match = self._evaluate_condition(doc.get(k), v)
+
+                    if not match:
+                        break
+
+                if match:
                     updated_doc = {**doc, **updates}
                     try:
                         self._validate_document(collection, updated_doc)
@@ -354,13 +369,23 @@ class Database:
             else:
                 to_delete = []
                 for doc in reversed(collection_data):
-                    if all(
-                        self._evaluate_condition(doc.get(k), v) if isinstance(v, dict) else doc.get(k) == v
-                        for k, v in query.items()
-                    ):
-                        to_delete.append(doc)
-                        if limit > 0 and len(to_delete) >= limit:
+                    match = True
+                    for k, v in query.items():
+                        if k == '$or' and isinstance(v, list):
+                            match = any(self._evaluate_condition(doc.get(cond[0]), cond[1]) for cond in v)
+                        elif k == '$and' and isinstance(v, list):
+                            match = all(self._evaluate_condition(doc.get(cond[0]), cond[1]) for cond in v)
+                        else:
+                            match = self._evaluate_condition(doc.get(k), v)
+
+                        if not match:
                             break
+
+                    if match:
+                        to_delete.append(doc)
+                        
+                    if limit > 0 and len(to_delete) >= limit:
+                        break
 
                 deleted_docs = to_delete
                 for doc in to_delete:

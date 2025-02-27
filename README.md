@@ -54,7 +54,7 @@ When you initialize PieDB, it automatically detects an existing database or crea
   db = Database("mydb")
 ```
 
-Database(db_file: str = "database") -> Database
+**Database(db_file: str = "database") -> Database**
 
 - filepath (optional, str): Name of the database file (without extension). Defaults to database.json.
 
@@ -71,7 +71,7 @@ Database(db_file: str = "database") -> Database
   db.backup_db("new_backup")
 ```
 
-backup_db(backup_file: str = "backup") -> bool
+**backup_db(backup_file: str = "backup") -> bool**
 
 - backup_name (str): Name for the backup file (without extension).
 
@@ -88,7 +88,7 @@ backup_db(backup_file: str = "backup") -> bool
   db.delete_db()
 ```
 
-delete_db() -> bool
+**delete_db() -> bool**
 
 - Returns: True if the database was successfully deleted, otherwise False.
 ## Collections
@@ -100,7 +100,7 @@ delete_db() -> bool
   db.collection("users")
 ```
 
-collection(collection: str, schema: dict = None) -> None
+**collection(collection: str, schema: dict = None) -> None**
 
 - collection (str): Name of the collection.
 
@@ -124,9 +124,30 @@ collection(collection: str, schema: dict = None) -> None
 
   # Create/Update collection with schema
   db.collection("users", schema=user_schema)
+
+  '''
+  mydb.json
+  {
+    "_counts": {
+        "users": 0
+    },
+    "_schemas": {
+        "users": {
+            "name": "str",
+            "age": "int",
+            "balance": "float",
+            "is_active": "bool",
+            "address": "dict",
+            "hobbies": "list",
+            "created_at": "datetime"
+        }
+    },
+    "users": []
+  }
+  '''
 ```
 
-collection(collection: str, schema: dict = None) -> None
+**collection(collection: str, schema: dict = None) -> None**
 
 - collection (str): Name of the collection.
 
@@ -139,21 +160,29 @@ collection(collection: str, schema: dict = None) -> None
 ```bash
   # Returns Collection Schema
   db.get_schema("users")
+
+  '''
+  {'name': <class 'str'>, 'age': <class 'int'>, 'balance': <class 'float'>, 'is_active': <class 'bool'>, 'address': <class 'dict'>, 'hobbies': <class 'list'>, 'created_at': <class 'datetime.datetime'>}
+  '''
 ```
 
-get_schema(collection: str) -> dict
+**get_schema(collection: str) -> dict**
 
-collection (str): Name of the collection.
+- collection (str): Name of the collection.
 
-Returns: Schema of the collection as a dictionary.
+- Returns: Schema of the collection as a dictionary.
 
 ### Getting All Collections
 
 ```bash
   # Returns all the collections
   db.get_collections()
+
+  '''
+  {'collections': ['users'], 'count': 1}
+  '''
 ```
-get_collections() -> dict
+**get_collections() -> dict**
 
 - Returns: A dict including list collection names and their count.
 
@@ -162,13 +191,17 @@ get_collections() -> dict
 ```bash
   # Returns the collection data
   db.get_collection_data("users")
+  
+  '''
+  {'users': {'_schema': {'name': 'str', 'age': 'int', 'balance': 'float', 'is_active': 'bool', 'address': 'dict', 'hobbies': 'list', 'created_at': 'datetime'}, 'count': 0, 'data': []}}
+  '''
 ```
 
-get_collection_data(collection: str) -> dict
+**get_collection_data(collection: str) -> dict**
 
-collection (str): Name of the collection.
+- collection (str): Name of the collection.
 
-Returns: A dict including schema, count and latest 5 documents in the collection.
+- Returns: A dict including schema, count and latest 5 documents in the collection.
 
 ### Delete Collection
 
@@ -177,11 +210,11 @@ Returns: A dict including schema, count and latest 5 documents in the collection
   db.delete_collection("users")
 ```
 
-delete_collection(collection: str) -> bool
+**delete_collection(collection: str) -> bool**
 
-collection (str): Name of the collection to be deleted.
+- collection (str): Name of the collection to be deleted.
 
-Returns: True if the collection was successfully deleted, otherwise False.
+- Returns: True if the collection was successfully deleted, otherwise False.
 ## Datatypes
 
 ### Supported Datatypes
@@ -204,22 +237,26 @@ Returns: True if the collection was successfully deleted, otherwise False.
       "name": "John Doe",
       "age": 24,
       "balance": 99.99,
-      "is_active": true,
+      "is_active": True,
       "address": {
         "line 1": "ABC Road",
         "line 2": "XYZ Colony",
         "city": "Bangalore",
         "postcode": "560001" 
       },
-      "hobbies": ["coding", "projects"]
+      "hobbies": ["coding", "projects"],
       "created_at": "2025-02-22T10:10:10" # datetime.datetime.strptime("2025-02-22T10:10:10", "%Y-%m-%dT%H:%M:%S")
   }
 
   # Add single document to collection
   db.add("users", doc)
+
+  '''
+  67c0959bclRXq1w #unique_id
+  '''
 ```
 
-add(collection: str, document: dict) -> str
+**add(collection: str, document: dict) -> str**
 
 - collection (str): Name of the collection.
 
@@ -234,36 +271,40 @@ add(collection: str, document: dict) -> str
       "name": "John Doe",
       "age": 24,
       "balance": 99.99,
-      "is_active": true,
+      "is_active": True,
       "address": {
         "line 1": "ABC Road",
         "line 2": "XYZ Colony",
         "city": "Bangalore",
         "postcode": "560001" 
       },
-      "hobbies": ["coding", "projects"]
+      "hobbies": ["coding", "projects"],
       "created_at": "2025-02-22T10:10:10" # datetime.datetime.strptime("2025-02-22T10:10:10", "%Y-%m-%dT%H:%M:%S")
   }, 
   {
       "name": "Jane Doe",
       "age": 22,
       "balance": 99.99,
-      "is_active": true,
+      "is_active": True,
       "address": {
         "line 1": "ABC Road",
         "line 2": "XYZ Colony",
         "city": "Bangalore",
         "postcode": "560001" 
       },
-      "hobbies": ["coding", "projects"]
+      "hobbies": ["coding", "projects"],
       "created_at": "2025-02-22T10:10:10" # datetime.datetime.strptime("2025-02-22T10:10:10", "%Y-%m-%dT%H:%M:%S")
   }]
 
   # Add single document to collection
   db.add_many("users", docs)
+
+  '''
+  ['67c0969bcFEezR8', '67c0969bcz6l8l0']
+  '''
 ```
 
-add_many(collection: str, documents: list) -> list
+**add_many(collection: str, documents: list) -> list**
 
 - collection (str): Name of the collection.
 
@@ -288,9 +329,13 @@ add_many(collection: str, documents: list) -> list
   # If the limit is 0, updated all the documents matching the query
 
   db.update("users", updates, query, limit)
+
+  '''
+  [{'name': 'John Doe', 'age': 24, 'balance': 999.99, 'is_active': True, 'address': {'line 1': 'ABC Road', 'line 2': 'XYZ Colony', 'city': 'Bangalore', 'postcode': '560001'}, 'hobbies': ['coding', 'projects'], 'created_at': '2025-02-22T10:10:10', '#id': '67c0959bclRXq1w'}]
+  '''
 ```
 
-update(collection: str, updates: dict, query: dict, limit: int) -> list
+**update(collection: str, updates: dict, query: dict, limit: int) -> list**
 
 - collection (str): Name of the collection.
 
@@ -318,8 +363,12 @@ Returns: The list of documents updated.
   # If the limit is 0, updated all the documents matching the query
 
   db.delete("users", query, limit)
+
+  '''
+[{'name': 'John Doe', 'age': 24, 'balance': 99.99, 'is_active': True, 'address': {'line 1': 'ABC Road', 'line 2': 'XYZ Colony', 'city': 'Bangalore', 'postcode': '560001'}, 'hobbies': ['coding', 'projects'], 'created_at': '2025-02-22T10:10:10', '#id': '67c0989bcfsUUkO'}]
+  '''
 ```
-delete(collection: str, query: dict, limit: int) -> list
+**delete(collection: str, query: dict, limit: int) -> list**
 
 - collection (str): Name of the collection.
 
@@ -398,7 +447,7 @@ delete(collection: str, query: dict, limit: int) -> list
   db.find("users", query, limit, skip, sort, order)
 ```
 
-find(collection: str, query: dict, limit: int = None, skip: int = 0, sort: str = None, order: str = "asc") -> list
+**find(collection: str, query: dict, limit: int = None, skip: int = 0, sort: str = None, order: str = "asc") -> list**
 
 - collection (str): Name of the collection.
 
@@ -406,13 +455,13 @@ find(collection: str, query: dict, limit: int = None, skip: int = 0, sort: str =
 
 - limit (int, optional): Maximum number of documents to return (If None returns all matches).
 
-skip (int, optional): Number of documents to skip. Defaults to 0.
+- skip (int, optional): Number of documents to skip. Defaults to 0.
 
-sort (str, optional): Field name to sort results by. Defaults to None (no sorting).
+- sort (str, optional): Field name to sort results by. Defaults to None (no sorting).
 
-order (str, optional): Sorting order, either "asc" for ascending or "desc" for descending. Defaults to "asc".
+- order (str, optional): Sorting order, either "asc" for ascending or "desc" for descending. Defaults to "asc".
 
-Returns: A list of matching documents.
+- Returns: A list of matching documents.
 ## Exceptions
 
 **CollectionNotFoundError** - When the collection does not exists
@@ -422,7 +471,6 @@ Returns: A list of matching documents.
 **DocumentValidationError** - when a document has invalid fields or missing data
 
 **ReservedKeyError** - when the string contains reserved keys - _schemas and _counts
-
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
