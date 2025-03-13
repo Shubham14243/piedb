@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="piedb",
-    version="0.1.0",
+    version="0.1.1",
     author="Shubham Kumar Gupta",
     author_email="skgsmasher14243@gmail.com",
     description="A lightweight JSON-based database",
