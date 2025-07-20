@@ -33,3 +33,11 @@ class ReservedKeyError(Exception):
         self.message = f"{self.keys} {message}"
         super().__init__(self.message)
 
+
+class UnsupportedOperatorError(Exception):
+    """Raised when an unsupported operator is used in a query."""
+    
+    def __init__(self, operator, message="is not a supported operator."):
+        self.operator = operator
+        self.message = f"{operator} {message}"
+        super().__init__(self.message)
