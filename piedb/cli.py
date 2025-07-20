@@ -66,12 +66,12 @@ def main():
     parser_document_update = document_subparsers.add_parser('update', help='Update documents in a collection')
     parser_document_update.add_argument('collection_name', type=str, help='Name of the collection')
     parser_document_update.add_argument('update', type=str, help='Update operations in JSON format')
-    parser_document_update.add_argument('query', type=str, help='Query to match documents')
+    parser_document_update.add_argument('--query', type=str, help='Query to match documents')
     parser_document_update.add_argument('--limit', type=int, default=0, help='Update multiple documents')
     
     parser_document_delete = document_subparsers.add_parser('delete', help='Delete documents from a collection')
     parser_document_delete.add_argument('collection_name', type=str, help='Name of the collection')
-    parser_document_delete.add_argument('query', type=str, help='Query to match documents')
+    parser_document_delete.add_argument('--query', type=str, help='Query to match documents')
     parser_document_delete.add_argument('--limit', type=int, default=0, help='Delete multiple documents')
     
     #Find command
@@ -91,6 +91,9 @@ def main():
     
     parser_restore = subparsers.add_parser('restore', help='Restore the database from a backup')
     parser_restore.add_argument('backup_file', type=str, help='Path to the backup file')
+    
+    # Info command
+    parser_info = subparsers.add_parser("info", help="Show PieDB CLI information")
 
     print('############### PieDB CLI! ###############\nType "exit" to quit cli.')
 
@@ -184,27 +187,28 @@ def main():
 
                 if args.document_command == 'add':
                     collection_name = args.collection_name
-                    document = eval(args.document)
-                    DATABASE.add(collection_name, document)
-                    print(f"Document added to collection '{collection_name}'.")
+                    document = json.loads(args.document)
+                    ids = DATABASE.add(collection_name, document)
+                    print(f"Document added to collection '{collection_name}': {ids}")
 
                 elif args.document_command == 'add_many':
                     collection_name = args.collection_name
                     documents = eval(args.documents)
-                    DATABASE.add_many(collection_name, documents)
+                    ids = DATABASE.add_many(collection_name, documents)
+                    print(f"Documents added to collection '{collection_name}': {ids}")
                     print(f"{len(documents)} documents added to collection '{collection_name}'.")
 
                 elif args.document_command == 'update':
                     collection_name = args.collection_name
-                    update = eval(args.update)
-                    query = eval(args.query)
+                    update = json.loads(args.update)
+                    query = json.loads(args.query)
                     limit = args.limit
                     updated_docs = DATABASE.update(collection_name, update, query, limit)
                     print(f"Updated {len(updated_docs)} documents in collection '{collection_name}'.")
 
                 elif args.document_command == 'delete':
                     collection_name = args.collection_name
-                    query = eval(args.query)
+                    query = json.loads(args.query)
                     limit = args.limit
                     deleted_docs = DATABASE.delete(collection_name, query, limit)
                     print(f"Deleted {len(deleted_docs)} documents from collection '{collection_name}'.")
@@ -256,6 +260,14 @@ def main():
                 backup_file = args.backup_file
                 DATABASE.restore_db(backup_file)
                 print(f"Database restored from '{backup_file}'.")
+                
+            elif args.command == 'info':
+                print("PieDB CLI - A simple JSON database CLI")
+                print("Version - 2.0.0")
+                print("Author - Shubham Kumar Gupta")
+                print("For more information, visit: https://pypi.org/project/piedb/")
+                print("View on Github - https://github.com/Shubham14243/piedb")
+                print("Use 'piedb <command> --help' for more information on a specific command.")
 
             else:
                 print('Unknown Command.')
@@ -263,7 +275,7 @@ def main():
         except SystemExit:
             pass
         except Exception as e:
-            print(f"Error: {e.message}")
+            print(f"Error: {str(e)}")
 
 if __name__ == '__main__':
     main()

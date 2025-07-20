@@ -27,7 +27,7 @@ class Database:
         self.LOCK = RLock()
 
         self.SKELETON = {"_meta": {"_version": self.VERSION, "_path": self.PATH, "_count": {}, "_schema": {}}}
-        self.RESERVED_KEYS = ["_meta", "_path", "_count", "_schema", "_id_"]
+        self.RESERVED_KEYS = ["_meta", "_version", "_path", "_count", "_schema", "_id_"]
 
         if not os.path.exists(self.DB_FILE):
             with open(self.DB_FILE, "w") as f:
@@ -458,7 +458,7 @@ class Database:
             return backup_filename
         
     
-    def restore_db(self, backup_file_path: str) -> None:
+    def restore_db(self, backup_file_path: str) -> bool:
         """Restore the database from a backup file."""
 
         if not backup_file_path.endswith(self.EXT):
@@ -514,4 +514,5 @@ class Database:
                         print(f"Created new collection '{new_name}' due to schema mismatch. Inserted {len(docs)} documents.")
 
             print("Restore completed successfully.")
-
+            return True
+        return False
